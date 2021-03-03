@@ -86,7 +86,7 @@ def pega_pontos(img, testing = False):
     #retorna o vetor coordenadas
     return coordenadas
 
-im1 = cv2.imread('/content/imagem9.jpg') # endereço da imagem
+im1 = cv2.imread('/content/imagem9.jpg')
 pontos1 = pega_pontos(im1)
 
 src = np.float32([(600, 80),
@@ -112,3 +112,16 @@ plt.subplot(122),plt.imshow(warpImg)
 plt.title('Tranformada'), plt.xticks([]), plt.yticks([])
 
 plt.show()
+
+edges = cv2.Canny(warpImg,100,200)
+plt.subplot(121),plt.imshow(warpImg,cmap = 'gray')
+plt.title('Original warpImg'), plt.xticks([]), plt.yticks([])
+plt.subplot(122),plt.imshow(edges,cmap = 'gray')
+plt.title('Edge warpImg'), plt.xticks([]), plt.yticks([])
+
+plt.show()
+
+# Pontos do contorno
+imgray = cv2.cvtColor(warpImg, cv2.COLOR_BGR2GRAY)
+ret, thresh = cv2.threshold(imgray, 127, 255, 0)
+contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
