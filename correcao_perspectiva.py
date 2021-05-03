@@ -1,7 +1,6 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-import cv2
 import re
 import math
 
@@ -86,13 +85,14 @@ def pega_pontos(img, testing = False):
     #retorna o vetor coordenadas
     return coordenadas
 
+# Caminho da imagem
 im1 = cv2.imread('/content/imagem9.jpg')
 pontos1 = pega_pontos(im1)
 
-src = np.float32([(600, 80),
-                  (80, 80),
-                  (600, 300),
-                  (80, 300)])
+src = np.float32([(545, 100),
+                  (115, 100),
+                  (545, 300),
+                  (115, 300)])
 
 f_scale = 1.0
 comprim = 500
@@ -113,6 +113,7 @@ plt.title('Tranformada'), plt.xticks([]), plt.yticks([])
 
 plt.show()
 
+# Bordas
 edges = cv2.Canny(warpImg,100,200)
 plt.subplot(121),plt.imshow(warpImg,cmap = 'gray')
 plt.title('Original warpImg'), plt.xticks([]), plt.yticks([])
