@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import re
 import math
+from PIL import Image
 
 def unwarp(img, src, dst, testing):
     #pega a altura e comprimento da imagem
@@ -87,42 +88,67 @@ def pega_pontos(img, testing = False):
 
 # Caminho da imagem
 im1 = cv2.imread('/content/imagem9.jpg')
+baseheight = 560
+img = Image.open('/content/imagem9.jpg')
+hpercent = (baseheight / float(img.size[1]))
+wsize = int((float(img.size[0]) * float(hpercent)))
+img = img.resize((wsize, baseheight), Image.ANTIALIAS)
+img.save('resized_image.jpg')
+im2 = cv2.imread('/content/resized_image.jpg')
+
+# Captura dos pontos na imagem
 pontos1 = pega_pontos(im1)
+pontos2 = pega_pontos(im2)
 
-src = np.float32([(545, 100),
-                  (115, 100),
-                  (545, 300),
-                  (115, 300)])
+# Fonte
+src1 = np.float32([(500, 85),
+                  (120, 85),
+                  (500, 285),
+                  (120, 285)])
+src2 = np.float32([(560, 100),
+                  (140, 100),
+                  (560, 320),
+                  (140, 320)])
 
-f_scale = 1.0
-comprim = 500
-larg = 500
-
-dst = np.float32([(700, 0),
+# Destino
+dst1 = np.float32([(735, 0),
                   (0, 0),
-                  (700, 400),
-                  (0, 400)])
+                  (735, 440),
+                  (0, 440)])
+dst2 = np.float32([(700, 0),
+                  (0, 0),
+                  (700, 415),
+                  (0, 415)])
 
-warpData = unwarp(im1, src, dst, False)
+warpData = unwarp(im1, src1, dst1, False)
 warpImg  = warpData[0]
+warpData2 = unwarp(im2, src2, dst2, False)
+warpImg2  = warpData2[0]
 
+# Plotagem das imagens
 plt.subplot(121),plt.imshow(im1)
 plt.title('Original'), plt.xticks([]), plt.yticks([])
-plt.subplot(122),plt.imshow(warpImg)
+plt.subplot(122),plt.imshow(warpImg2)
 plt.title('Tranformada'), plt.xticks([]), plt.yticks([])
-
 plt.show()
 
-# Bordas
-edges = cv2.Canny(warpImg,100,200)
-plt.subplot(121),plt.imshow(warpImg,cmap = 'gray')
+edges = cv2.Canny(warpImg2,100,200)
+plt.subplot(121),plt.imshow(warpImg2,cmap = 'gray')
 plt.title('Original warpImg'), plt.xticks([]), plt.yticks([])
 plt.subplot(122),plt.imshow(edges,cmap = 'gray')
 plt.title('Edge warpImg'), plt.xticks([]), plt.yticks([])
-
 plt.show()
 
 # Pontos do contorno
 imgray = cv2.cvtColor(warpImg, cv2.COLOR_BGR2GRAY)
 ret, thresh = cv2.threshold(imgray, 127, 255, 0)
 contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+# Plotagem do contorno na imagem
+imgray = cv2.cvtColor(warpImg,cv2.COLOR_BGR2GRAY)
+ret,thresh = cv2.threshold(imgray, 120,255,cv2.THRESH_BINARY)
+contours = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[-2]
+for contour in contours:
+  cv2.drawContours(warpImg2, contour, -5, (0, 255, 100), 3)
+plt.figure()
+plt.imshow(warpImg2)
