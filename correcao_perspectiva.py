@@ -86,6 +86,35 @@ def pega_pontos(img, testing = False):
     #retorna o vetor coordenadas
     return coordenadas
 
+# Ajuste do brilho
+def adjust_gamma(image, gamma=1.0):
+
+   invGamma = 1.0 / gamma
+   table = np.array([((i / 255.0) ** invGamma) * 255
+      for i in np.arange(0, 256)]).astype("uint8")
+
+   return cv2.LUT(image, table)
+
+x = '/content/imagem9.jpg' 
+original = cv2.imread(x, 1)
+cv2_imshow(original)
+
+# Imagem mais escura
+gamma = 0.5                             
+adjusted1 = adjust_gamma(original, gamma=gamma)
+cv2.putText(adjusted1, "g={}".format(gamma), (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
+cv2_imshow(adjusted1)
+im = Image.fromarray(adjusted1)
+im.save("adjusted1.jpg")
+
+# Imagem mais clara
+gamma = 2                     
+adjusted2 = adjust_gamma(original, gamma=gamma)
+cv2.putText(adjusted2, "g={}".format(gamma), (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
+cv2_imshow(adjusted2)
+im = Image.fromarray(adjusted2)
+im.save("adjusted2.jpg")
+
 # Caminho da imagem
 im1 = cv2.imread('/content/imagem9.jpg')
 baseheight = 560
@@ -139,11 +168,6 @@ plt.subplot(122),plt.imshow(edges,cmap = 'gray')
 plt.title('Edge warpImg'), plt.xticks([]), plt.yticks([])
 plt.show()
 
-# Pontos do contorno
-imgray = cv2.cvtColor(warpImg, cv2.COLOR_BGR2GRAY)
-ret, thresh = cv2.threshold(imgray, 127, 255, 0)
-contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
 # Plotagem do contorno na imagem
 imgray = cv2.cvtColor(warpImg,cv2.COLOR_BGR2GRAY)
 ret,thresh = cv2.threshold(imgray, 120,255,cv2.THRESH_BINARY)
@@ -152,3 +176,9 @@ for contour in contours:
   cv2.drawContours(warpImg2, contour, -5, (0, 255, 100), 3)
 plt.figure()
 plt.imshow(warpImg2)
+
+# Escrita de arquivo do contorno
+arquivo = open("contornos.txt", "a")
+for e in contour:
+  str_sub = str(e)
+  arquivo.write(str_sub[1:-1])
